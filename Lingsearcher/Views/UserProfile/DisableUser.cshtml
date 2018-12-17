@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewBag.Title = "Disable User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>UpdatePassword</h2>
+
+@using (Html.BeginForm())
+{
+    if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
+    {
+        <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @Html.ValidationSummary(true, "Errors: ")
+        </div>
+    }
+
+    @Html.EditorForModel()
+
+    <input type="submit" value="Desativar conta" class="btn btn-success" />
+}
