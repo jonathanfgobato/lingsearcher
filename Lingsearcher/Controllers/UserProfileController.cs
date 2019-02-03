@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
 
 namespace Lingsearcher.Controllers
 {
@@ -32,6 +33,15 @@ namespace Lingsearcher.Controllers
             set
             {
                 _userManager = value;
+            }
+        }
+
+        public IAuthenticationManager _authenticationManager
+        {
+            get
+            {
+                var contextoOwin = Request.GetOwinContext();
+                return contextoOwin.Authentication;
             }
         }
 
@@ -69,9 +79,6 @@ namespace Lingsearcher.Controllers
                     model.PostalCode = address.PostalCode;
                 }
             }
-
-
-
             return View(model);
         }
 
@@ -160,7 +167,6 @@ namespace Lingsearcher.Controllers
 
                 var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 
-
                 if (!result.Succeeded)
                 {
                     AddErrors(result);
@@ -170,7 +176,6 @@ namespace Lingsearcher.Controllers
                 {
                     return RedirectToAction("Index", "Home");
                 }
-
             }
 
             return View();
@@ -197,6 +202,7 @@ namespace Lingsearcher.Controllers
                 }
                 else
                 {
+                    _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
                     return RedirectToAction("Index", "Home");
                 }
             }

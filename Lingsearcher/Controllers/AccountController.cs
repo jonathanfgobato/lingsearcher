@@ -201,7 +201,6 @@ namespace Lingsearcher.Controllers
 
                     return View("ConfirmEmailPassword");
                 }
-
             }
 
             return View("ConfirmEmailPassword");
