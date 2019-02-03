@@ -361,7 +361,6 @@
     <Content Include="fonts\poppins\Poppins-SemiBoldItalic.ttf" />
     <Content Include="fonts\poppins\Poppins-Thin.ttf" />
     <Content Include="fonts\poppins\Poppins-ThinItalic.ttf" />
-    <Content Include="Anotacoes Lingsearcher.one" />
     <None Include="Properties\PublishProfiles\lingsearcher - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
