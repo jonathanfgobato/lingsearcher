@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Lingsearcher.ViewModels;
+using Lingseacher.Identity;
 
 namespace Lingsearcher.Controllers
 {
@@ -88,10 +89,21 @@ namespace Lingsearcher.Controllers
                 if (result.Succeeded)
                 {
                     // Enviar o email de confirmação
-                    await SendMailConfirmationAsync(newUser);
+                    //await SendMailConfirmationAsync(newUser);
+
+                    //Alteração para desenvolvimento
+
+                    var token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser.Id);
+
+                    // Gera um link de confirmação para o usuário que acabou de se cadastrar
+                    var linkOfCallback = Url.Action("ConfirmEmail", "Account", new { userId = newUser.Id, token = token },
+                        Request.Url.Scheme);
+
+                    ViewBag.LinkCallback = linkOfCallback;
 
                     // Retornar para uma página para confirmar
-                    return View("WaitingConfirmation");
+                    //return View("WaitingConfirmation");
+                    return View(model);
                 }
                 else
                     AddErrors(result);
@@ -125,12 +137,15 @@ namespace Lingsearcher.Controllers
             if (ModelState.IsValid)
             {
                 // Realizar login pelo Identity
-                var user = await UserManager.FindByEmailAsync(model.Email);
+                //var user = await UserManager.FindByEmailAsync(model.Email);
+
+                var user = await UserManager.FindByNameOrEmailAsync(model.UserNameOrEmail, model.Password);
 
                 if (user == null)
                 {
                     return PasswordOrUserInvalid();
                 }
+
                 var signInResult = await SignInManager.PasswordSignInAsync
                 (
                     user.UserName,

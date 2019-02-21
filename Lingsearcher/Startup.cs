@@ -1,4 +1,5 @@
 ﻿using Lingseacher.Entity;
+using Lingsearcher;
 using Lingsearcher.App_Start.Identity;
 using Lingsearcher.Entity;
 using Microsoft.AspNet.Identity;
@@ -21,9 +22,14 @@ namespace ByteBank.Forum
     {
         public void Configuration(IAppBuilder builder)
         {
+            
             builder.CreatePerOwinContext<DbContext>(() =>
                 new IdentityDbContext<UserApplication>("DefaultConnection"));
-
+            
+            /*
+            builder.CreatePerOwinContext<DbContext>(() =>
+                new DbContextIdentity<UserApplication>());
+            */
             builder.CreatePerOwinContext<IUserStore<UserApplication>>(
                 (opcoes, contextoOwin) =>
                 {
@@ -88,8 +94,8 @@ namespace ByteBank.Forum
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 CookieName = "UserApplicationCookie",
-                
-        });
+                ExpireTimeSpan = TimeSpan.FromMinutes(60)
+            });
 
         }
     }
