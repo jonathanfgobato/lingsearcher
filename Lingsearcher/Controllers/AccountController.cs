@@ -89,10 +89,10 @@ namespace Lingsearcher.Controllers
                 if (result.Succeeded)
                 {
                     // Enviar o email de confirmação
-                    //await SendMailConfirmationAsync(newUser);
+                    await SendMailConfirmationAsync(newUser);
 
                     //Alteração para desenvolvimento
-
+                    /*
                     var token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser.Id);
 
                     // Gera um link de confirmação para o usuário que acabou de se cadastrar
@@ -100,10 +100,11 @@ namespace Lingsearcher.Controllers
                         Request.Url.Scheme);
 
                     ViewBag.LinkCallback = linkOfCallback;
+                    */
 
                     // Retornar para uma página para confirmar
-                    //return View("WaitingConfirmation");
-                    return View(model);
+                    return View("WaitingConfirmation");
+                    //return View(model);
                 }
                 else
                     AddErrors(result);

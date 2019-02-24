@@ -20,11 +20,17 @@ namespace ByteBank.Forum
 {
     public class Startup
     {
+        private string ConnectionString = "Server=lingsearcher.database.windows.net;Initial Catalog=lingsearcher;MultipleActiveResultSets=true;User ID=gobatoj;Password=wjfo$nfD";
+
         public void Configuration(IAppBuilder builder)
         {
-            
+            /*
+             * Com connection string no Web Config
+                builder.CreatePerOwinContext<DbContext>(() =>
+                        new IdentityDbContext<UserApplication>("DefaultConnection"));
+            */
             builder.CreatePerOwinContext<DbContext>(() =>
-                new IdentityDbContext<UserApplication>("DefaultConnection"));
+                new IdentityDbContext<UserApplication>(ConnectionString));
             
             /*
             builder.CreatePerOwinContext<DbContext>(() =>

@@ -14,7 +14,7 @@ namespace Lingsearcher.App_Start.Identity
     public class MailService : IIdentityMessageService
     {
         private readonly string Email = ConfigurationManager.AppSettings["MailService:email_from"];
-        private readonly string Email_Password = ConfigurationManager.AppSettings["MailService:email_password"];
+        private readonly string Email_Password = /*ConfigurationManager.AppSettings["MailService:email_password"]*/ "jhn2391k";
 
         public async Task SendAsync(IdentityMessage message)
         {
