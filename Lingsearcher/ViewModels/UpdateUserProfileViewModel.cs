@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Lingsearcher.ViewModels
 {
@@ -52,6 +53,7 @@ namespace Lingsearcher.ViewModels
         [MaxLength(50)]
         public string Country { get; set; }
 
-
+        [HiddenInput(DisplayValue = false)]
+        public int AddressId { get; set; }
     }
 }

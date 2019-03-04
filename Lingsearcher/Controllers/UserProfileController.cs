@@ -3,9 +3,6 @@ using Lingsearcher.DAL;
 using Lingsearcher.Entity;
 using Lingsearcher.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -83,6 +80,7 @@ namespace Lingsearcher.Controllers
                         model.State = address.State;
                         model.Street = address.Street;
                         model.PostalCode = address.PostalCode;
+                        model.AddressId = userSystem.AddressId;
                     }
                 }
             }
@@ -106,16 +104,24 @@ namespace Lingsearcher.Controllers
 
                     var newAddress = new Address
                     {
+                        Id = model.AddressId,
                         Street = model.Street,
                         State = model.State,
                         PostalCode = model.PostalCode,
                         Country = model.Country,
                         City = model.City,
-                        Neighbourhood = model.Neighbourhood,
-
+                        Neighbourhood = model.Neighbourhood
                     };
 
-                    newAddress = new BaseDAO<Address>().Insert(newAddress);
+                    if(newAddress.Id == 0 )
+                    {
+                        newAddress = new BaseDAO<Address>().Insert(newAddress);
+                    }
+                    else
+                    {
+                        new BaseDAO<Address>().Update(newAddress);
+                    }
+                    
 
                     var userApplication = await UserManager.FindByIdAsync(User.Identity.GetUserId());
 
