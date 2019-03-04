@@ -24,27 +24,32 @@ namespace Lingsearcher.ViewModels
 
         [Required]
         [Display(Name = "CEP")]
+        [MaxLength(30)]
         public string PostalCode { get; set; }
 
         [Required]
         [Display(Name = "Rua")]
+        [MaxLength(50)]
         public string Street { get; set; }
 
         [Required]
         [Display(Name = "Bairro")]
+        [MaxLength(50)]
         public string Neighbourhood { get; set; }
 
         [Required]
         [Display(Name = "Cidade")]
+        [MaxLength(50)]
         public string City { get; set; }
 
         [Required]
         [Display(Name = "Estado")]
+        [MaxLength(2)]
         public string State { get; set; }
-
 
         [Required]
         [Display(Name = "País")]
+        [MaxLength(50)]
         public string Country { get; set; }
 
 

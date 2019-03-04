@@ -7,6 +7,8 @@ using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Lingsearcher.ViewModels;
 using Lingseacher.Identity;
+using log4net;
+using System;
 
 namespace Lingsearcher.Controllers
 {
@@ -14,6 +16,7 @@ namespace Lingsearcher.Controllers
     {
         private UserRegisterViewModel viewModel = new UserRegisterViewModel();
         private UserManager<UserApplication> _userManager;
+        private static readonly ILog _logger = LogManager.GetLogger(Environment.MachineName);
 
         public UserManager<UserApplication> UserManager
         {
@@ -71,43 +74,53 @@ namespace Lingsearcher.Controllers
             // Validação da classe de modelo, se tudo está ok
             if (ModelState.IsValid)
             {
-                // Instanciação de uma nova classe UserApplication com os parâmetros pegos da RegisterViewModel
-                var newUser = new UserApplication
-                { 
-                    Email = model.Email,
-                    UserName = model.UserName,
-                    FullName = model.FullName
-                };
-
-                // Buscar usuário por email cadastrado no banco de dados
-                var user = await UserManager.FindByEmailAsync(model.Email);
-
-                // Inclusão de um novo usuário no banco de dados
-                var result = await UserManager.CreateAsync(newUser, model.Password);
-
-                // Retorno de um booleano de sucesso ou não da operação
-                if (result.Succeeded)
+                try
                 {
-                    // Enviar o email de confirmação
-                    await SendMailConfirmationAsync(newUser);
 
-                    //Alteração para desenvolvimento
-                    /*
-                    var token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser.Id);
 
-                    // Gera um link de confirmação para o usuário que acabou de se cadastrar
-                    var linkOfCallback = Url.Action("ConfirmEmail", "Account", new { userId = newUser.Id, token = token },
-                        Request.Url.Scheme);
+                    // Instanciação de uma nova classe UserApplication com os parâmetros pegos da RegisterViewModel
+                    var newUser = new UserApplication
+                    {
+                        Email = model.Email,
+                        UserName = model.UserName,
+                        FullName = model.FullName
+                    };
 
-                    ViewBag.LinkCallback = linkOfCallback;
-                    */
+                    // Buscar usuário por email cadastrado no banco de dados
+                    var user = await UserManager.FindByEmailAsync(model.Email);
 
-                    // Retornar para uma página para confirmar
-                    return View("WaitingConfirmation");
-                    //return View(model);
+                    // Inclusão de um novo usuário no banco de dados
+                    var result = await UserManager.CreateAsync(newUser, model.Password);
+
+                    // Retorno de um booleano de sucesso ou não da operação
+                    if (result.Succeeded)
+                    {
+                        // Enviar o email de confirmação
+                        await SendMailConfirmationAsync(newUser);
+
+                        //Alteração para desenvolvimento
+                        /*
+                        var token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser.Id);
+
+                        // Gera um link de confirmação para o usuário que acabou de se cadastrar
+                        var linkOfCallback = Url.Action("ConfirmEmail", "Account", new { userId = newUser.Id, token = token },
+                            Request.Url.Scheme);
+
+                        ViewBag.LinkCallback = linkOfCallback;
+                        */
+
+                        // Retornar para uma página para confirmar
+                        return View("WaitingConfirmation");
+                        //return View(model);
+                    }
+                    else
+                        AddErrors(result);
                 }
-                else
-                    AddErrors(result);
+                catch(Exception ex)
+                {
+                    _logger.Error(ex);
+                    return View("Error");
+                }
             }
 
             // Caso de erro devolver uma mensagem de erro e o objeto preenchido
@@ -137,46 +150,56 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Realizar login pelo Identity
-                //var user = await UserManager.FindByEmailAsync(model.Email);
-
-                var user = await UserManager.FindByNameOrEmailAsync(model.UserNameOrEmail, model.Password);
-
-                if (user == null)
+                try
                 {
-                    return PasswordOrUserInvalid();
-                }
 
-                var signInResult = await SignInManager.PasswordSignInAsync
-                (
-                    user.UserName,
-                    model.Password,
-                    isPersistent: model.KeepLoggedIn,
-                    shouldLockout: true
-                );
 
-                switch (signInResult)
-                {
-                    case SignInStatus.Success:
-                        if (!user.EmailConfirmed)
-                        {
-                            // Método para deslogar o usuário
-                            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                    // Realizar login pelo Identity
+                    //var user = await UserManager.FindByEmailAsync(model.Email);
 
-                            return View("WaitingConfirmation");
-                        }
-                        return RedirectToAction("Index", "Home");
-                    case SignInStatus.LockedOut:
-                        // Retorna um booleano contendo a informação se a senha está correta ou não
-                        var passwordCorrect = await UserManager.CheckPasswordAsync(user, model.Password);
+                    var user = await UserManager.FindByNameOrEmailAsync(model.UserNameOrEmail, model.Password);
 
-                        if (!passwordCorrect)
-                            return PasswordOrUserInvalid();
-                        return UserLockedOut();
-
-                    default:
+                    if (user == null)
+                    {
                         return PasswordOrUserInvalid();
+                    }
 
+                    var signInResult = await SignInManager.PasswordSignInAsync
+                    (
+                        user.UserName,
+                        model.Password,
+                        isPersistent: model.KeepLoggedIn,
+                        shouldLockout: true
+                    );
+
+                    switch (signInResult)
+                    {
+                        case SignInStatus.Success:
+                            if (!user.EmailConfirmed)
+                            {
+                                // Método para deslogar o usuário
+                                _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+                                return View("WaitingConfirmation");
+                            }
+                            return RedirectToAction("Index", "Home");
+                        case SignInStatus.LockedOut:
+                            // Retorna um booleano contendo a informação se a senha está correta ou não
+                            var passwordCorrect = await UserManager.CheckPasswordAsync(user, model.Password);
+
+                            if (!passwordCorrect)
+                                return PasswordOrUserInvalid();
+                            return UserLockedOut();
+
+                        default:
+                            return PasswordOrUserInvalid();
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return View("Error");
                 }
             }
 
@@ -191,31 +214,40 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-
-                var user = await UserManager.FindByEmailAsync(model.Email);
-
-                if (user != null)
+                try
                 {
-                    // Gerar token de reset de senha
-                    var token = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
 
-                    // Gerar a url para o usuário
 
-                    var linkOfCallback = Url.Action(
-                                                    "ConfirmResetPassword",
-                                                    "Account",
-                                                    new { userId = user.Id, token = token },
-                                                    Request.Url.Scheme
-                                                    );
+                    var user = await UserManager.FindByEmailAsync(model.Email);
 
-                    // Enviar o email
+                    if (user != null)
+                    {
+                        // Gerar token de reset de senha
+                        var token = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
 
-                    await UserManager.SendEmailAsync(
-                        user.Id,
-                        "Lingsearher - Alteracao de senha",
-                        $"Clique aqui {linkOfCallback} para alterar sua senha");
+                        // Gerar a url para o usuário
 
-                    return View("ConfirmEmailPassword");
+                        var linkOfCallback = Url.Action(
+                                                        "ConfirmResetPassword",
+                                                        "Account",
+                                                        new { userId = user.Id, token = token },
+                                                        Request.Url.Scheme
+                                                        );
+
+                        // Enviar o email
+
+                        await UserManager.SendEmailAsync(
+                            user.Id,
+                            "Lingsearher - Alteracao de senha",
+                            $"Clique aqui {linkOfCallback} para alterar sua senha");
+
+                        return View("ConfirmEmailPassword");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return View("Error");
                 }
             }
 
@@ -240,22 +272,31 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-
-                // Verifica token recebido
-                if (model.UserId == null || model.Token == null)
-                    return View("Error");
-
-                // Trocar a senha
-                var resultReset = await UserManager.ResetPasswordAsync(model.UserId, model.Token, model.NewPassword);
-
-                if (resultReset.Succeeded)
+                try
                 {
-                    return RedirectToAction("Index", "Home");
+                    // Verifica token recebido
+                    if (model.UserId == null || model.Token == null)
+                        return View("Error");
+
+                    // Trocar a senha
+                    var resultReset = await UserManager.ResetPasswordAsync(model.UserId, model.Token, model.NewPassword);
+
+                    if (resultReset.Succeeded)
+                    {
+                        ViewBag.MessageResetPassword = "Senha alterada com sucesso!!";
+                        //return RedirectToAction("Index", "Home");
+                        return View();
+                    }
+
+                    AddErrors(resultReset);
                 }
-
-                AddErrors(resultReset);
-
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return View("Error");
+                }
             }
+            
             return View(model);
         }
         private ActionResult PasswordOrUserInvalid()

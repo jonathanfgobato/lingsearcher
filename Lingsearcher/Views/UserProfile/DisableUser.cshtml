@@ -1,10 +1,27 @@
-﻿
+﻿@using Microsoft.AspNet.Identity;
 @{
     ViewBag.Title = "Disable User";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>UpdatePassword</h2>
+
+@if (!String.IsNullOrEmpty(ViewBag.MessageDisableUser))
+{
+    <script>
+        Swal({
+            type: 'success',
+            title: 'Success!!!',
+            text: '@ViewBag.MessageDisableUser'
+        }).then(function () {
+            @{
+                var context = Request.GetOwinContext().Authentication;
+                context.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            }
+            window.location = "/Home/Index";
+        });
+    </script>
+                }
 
 @using (Html.BeginForm())
 {

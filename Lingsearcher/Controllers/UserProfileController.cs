@@ -12,12 +12,14 @@ using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using log4net;
 
 namespace Lingsearcher.Controllers
 {
     public class UserProfileController : Controller
     {
         private UserManager<UserApplication> _userManager;
+        private static readonly ILog _logger = LogManager.GetLogger(Environment.MachineName);
 
         public UserManager<UserApplication> UserManager
         {
@@ -42,6 +44,7 @@ namespace Lingsearcher.Controllers
             {
                 var contextoOwin = Request.GetOwinContext();
                 return contextoOwin.Authentication;
+                
             }
         }
 
@@ -49,35 +52,44 @@ namespace Lingsearcher.Controllers
         [HttpGet]
         public async Task<ActionResult> UpdateUserProfile()
         {
-            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-
-            UpdateUserProfileViewModel model = new UpdateUserProfileViewModel
+            UpdateUserProfileViewModel model = null;
+            try
             {
-                Email = user.Email,
-                FullName = user.FullName,
-                UserName = user.UserName,
-            };
+                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
 
-
-            UserSystemDao userSystemDao = new UserSystemDao();
-            UserSystem userSystem = new UserSystem();
-            userSystem.UserApplication = user;
-            userSystem = userSystemDao.GetByUserApplicationId(user.Id);
-
-            if(userSystem != null)
-            {
-                BaseDAO<Address> baseDAO = new BaseDAO<Address>();
-                Address address = baseDAO.GetById(userSystem.AddressId);
-
-                if (address != null)
+                model = new UpdateUserProfileViewModel
                 {
-                    model.City = address.City;
-                    model.Country = address.Country;
-                    model.Neighbourhood = address.Neighbourhood;
-                    model.State = address.State;
-                    model.Street = address.Street;
-                    model.PostalCode = address.PostalCode;
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    UserName = user.UserName,
+                };
+
+
+                UserSystemDao userSystemDao = new UserSystemDao();
+                UserSystem userSystem = new UserSystem();
+                userSystem.UserApplication = user;
+                userSystem = userSystemDao.GetByUserApplicationId(user.Id);
+
+                if (userSystem != null)
+                {
+                    BaseDAO<Address> baseDAO = new BaseDAO<Address>();
+                    Address address = baseDAO.GetById(userSystem.AddressId);
+
+                    if (address != null)
+                    {
+                        model.City = address.City;
+                        model.Country = address.Country;
+                        model.Neighbourhood = address.Neighbourhood;
+                        model.State = address.State;
+                        model.Street = address.Street;
+                        model.PostalCode = address.PostalCode;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                return View("Error");
             }
             return View(model);
         }
@@ -88,61 +100,70 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = UserManager.FindById(User.Identity.GetUserId());
-
-                var newAddress = new Address
+                try
                 {
-                    Street = model.Street,
-                    State = model.State,
-                    PostalCode = model.PostalCode,
-                    Country = model.Country,
-                    City = model.City,
-                    Neighbourhood = model.Neighbourhood
-                };
+                    var user = UserManager.FindById(User.Identity.GetUserId());
 
-                newAddress = new BaseDAO<Address>().Insert(newAddress);
+                    var newAddress = new Address
+                    {
+                        Street = model.Street,
+                        State = model.State,
+                        PostalCode = model.PostalCode,
+                        Country = model.Country,
+                        City = model.City,
+                        Neighbourhood = model.Neighbourhood,
 
-                var userApplication = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                    };
 
-                var newUserSystem = new UserSystem
-                {
-                    UserApplication = userApplication,
-                    Address = newAddress
-                };
+                    newAddress = new BaseDAO<Address>().Insert(newAddress);
 
-                userApplication.FullName = model.FullName;
-                userApplication.UserName = model.UserName;
+                    var userApplication = await UserManager.FindByIdAsync(User.Identity.GetUserId());
 
-                // Alteração das informações de Login do usuário
+                    var newUserSystem = new UserSystem
+                    {
+                        UserApplication = userApplication,
+                        Address = newAddress
+                    };
 
-                var result = UserManager.Update(userApplication);
-                if (!result.Succeeded)
-                {
-                    // Retornar para uma página para confirmar
-                    return View(model);
+                    userApplication.FullName = model.FullName;
+                    userApplication.UserName = model.UserName;
+
+                    // Alteração das informações de Login do usuário
+
+                    var result = UserManager.Update(userApplication);
+                    if (!result.Succeeded)
+                    {
+                        // Retornar para uma página para confirmar
+                        return View(model);
+                    }
+                    else
+                        AddErrors(result);
+
+                    BaseDAO<UserSystem> baseDAOUserSystem = new BaseDAO<UserSystem>();
+                    BaseDAO<Address> baseDaoAddress = new BaseDAO<Address>();
+
+                    newUserSystem.FgActive = 1;
+
+                    // Verifica se o usuário já tem as informações adicionais cadastradas
+
+                    UserSystem userSystem = new UserSystemDao().GetByUserApplicationId(user.Id);
+                    if (userSystem == null)
+                    {
+                        baseDAOUserSystem.Insert(newUserSystem);
+                        return View(model);
+                    }
+                    newUserSystem.Id = userSystem.Id;
+
+                    // Caso o usuário tenha a informação é atualizado com o novo valor
+                    //baseDaoAddress.Update(newAddress);
+
+                    baseDAOUserSystem.Update(newUserSystem);
                 }
-                else
-                    AddErrors(result);
-
-                BaseDAO<UserSystem> baseDAOUserSystem = new BaseDAO<UserSystem>();
-                BaseDAO<Address> baseDaoAddress = new BaseDAO<Address>();
-
-                newUserSystem.FgActive = 1;
-
-                // Verifica se o usuário já tem as informações adicionais cadastradas
-
-                UserSystem userSystem = new UserSystemDao().GetByUserApplicationId(user.Id);
-                if (userSystem == null)
+                catch (Exception ex)
                 {
-                    baseDAOUserSystem.Insert(newUserSystem);
-                    return View(model);
+                    _logger.Error(ex);
+                    return View("Error");
                 }
-                newUserSystem.Id = userSystem.Id;
-
-                // Caso o usuário tenha a informação é atualizado com o novo valor
-                //baseDaoAddress.Update(newAddress);
-                
-                baseDAOUserSystem.Update(newUserSystem);
             }
 
             return View(model);
@@ -159,22 +180,32 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (model.NewPassword != model.NewPasswordConfirmation)
+                try
                 {
-                    ModelState.AddModelError("", "Confirmação de senha não coincide");
-                    return View(model);
-                }
+                    if (model.NewPassword != model.NewPasswordConfirmation)
+                    {
+                        ModelState.AddModelError("", "Confirmação de senha não coincide");
+                        return View(model);
+                    }
 
-                var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+                    var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 
-                if (!result.Succeeded)
-                {
-                    AddErrors(result);
-                    return View(model);
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(result);
+                        return View(model);
+                    }
+                    else
+                    {
+                        ViewBag.MessageUpdatePassword = "Senha alterada com sucesso!!!";
+                        //return RedirectToAction("Index", "Home");
+                        return View();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    return RedirectToAction("Index", "Home");
+                    _logger.Error(ex);
+                    return View("Error");
                 }
             }
 
@@ -186,26 +217,37 @@ namespace Lingsearcher.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await UserManager.SetLockoutEndDateAsync(User.Identity.GetUserId(), DateTime.Today.AddYears(10));
-                BaseDAO<UserSystem> baseDAO = new BaseDAO<UserSystem>();
-
-                UserSystem userSystem = new UserSystemDao().GetByUserApplicationId(User.Identity.GetUserId());
-
-                userSystem.FgActive = 0;
-
-                baseDAO.Update(userSystem);
-
-                if (!result.Succeeded)
+                try
                 {
-                    AddErrors(result);
-                    return View();
+                    var result = await UserManager.SetLockoutEndDateAsync(User.Identity.GetUserId(), DateTime.Today.AddYears(10));
+                    BaseDAO<UserSystem> baseDAO = new BaseDAO<UserSystem>();
+
+                    UserSystem userSystem = new UserSystemDao().GetByUserApplicationId(User.Identity.GetUserId());
+
+                    userSystem.FgActive = 0;
+
+                    baseDAO.Update(userSystem);
+
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(result);
+                        return View();
+                    }
+                    else
+                    {
+                        //_authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                        //return RedirectToAction("Index", "Home");
+                        ViewBag.MessageDisableUser = "Usuario desativado com sucesso!!";
+                        return View();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-                    return RedirectToAction("Index", "Home");
+                    _logger.Error(ex);
+                    return View("Error");
                 }
             }
+            
             return View();
         }
 

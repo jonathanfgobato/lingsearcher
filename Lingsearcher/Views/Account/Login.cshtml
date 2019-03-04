@@ -4,25 +4,39 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Login</h2>
+<h2 class="mb-2">Login</h2>
+
+@if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
+{
+    <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        @Html.ValidationSummary(true, "Errors: ")
+    </div>
+}
 
 @using (Html.BeginForm("Login", "Account"))
 {
-    if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
-    {
-        <div class="alert alert-danger">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            @Html.ValidationSummary(true, "Errors: ")
-        </div>
-    }
+    <div class="form-group">
+        @Html.LabelFor(model => model.UserNameOrEmail, new { @for = "txtLogin" })
+        @Html.TextBoxFor(model => model.UserNameOrEmail, new { @class = "form-control", @placeholder = "Username or Email", @id = "txtLogin" })
+        @Html.ValidationMessageFor(model => model.UserNameOrEmail)
+    </div>
 
-    @Html.EditorForModel()
-    <br />
-    @Html.ActionLink("Forgot password?", "ForgotPassword")
-    <br />
-    @Html.Raw("Don’t have an account? ") @Html.ActionLink("Sign Up", "Register", "Account")
+    <div class="form-group">
+        @Html.LabelFor(model => model.Password, new { @for = "txtPassword" })
+        @Html.PasswordFor(model => model.Password, new { @class = "form-control", @placeholder = "********", @id = "txtPassword" })
+        @Html.ValidationMessageFor(model => model.Password)
+    </div>
 
-    <br />
-    <input type="submit" value="Login" class="btn btn-default" />
+    <div class="form-group">
+        @Html.ActionLink("Forgot password?", "ForgotPassword")
+        <br/>
+        @Html.Raw("Don’t have an account? ") @Html.ActionLink("Sign Up", "Register", "Account")
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Sign in" class="btn btn-success" />
+        <input type="reset" value="Reset" class="btn btn-danger" />
+    </div>
 }
 

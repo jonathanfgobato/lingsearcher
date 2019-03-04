@@ -5,9 +5,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Lingsearcher</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.all.min.js"></script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -29,7 +30,7 @@
                         <li>@Html.ActionLink("My account", "UpdateUserProfile", "UserProfile")</li>
                         <li>@Html.ActionLink("Create Article", "ArticleCreate", "Article")</li>
                     }
-                    </ul>
+                </ul>
 
                 @if (Request.IsAuthenticated)
                 {

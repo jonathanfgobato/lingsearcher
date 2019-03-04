@@ -6,24 +6,76 @@
 
 <h2>Update user profile</h2>
 
+@if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
+{
+    <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        @Html.ValidationSummary(true, "Errors: ")
+    </div>
+}
+
 @using (Html.BeginForm())
 {
-    if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
-    {
-        <div class="alert alert-danger">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            @Html.ValidationSummary(true, "Errors: ")
-        </div>
-    }
+    <div class="form-group">
+        @Html.LabelFor(model => model.FullName, new { @for = "txtFullName" })
+        @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", @placeholder = "Full name", @id = "txtFullName" })
+        @Html.ValidationMessageFor(model => model.FullName)
+    </div>
 
-    @Html.EditorForModel()
+    <div class="form-group">
+        @Html.LabelFor(model => model.UserName, new { @for = "txtUserName" })
+        @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @placeholder = "Username", @id = "txtUserName" })
+        @Html.ValidationMessageFor(model => model.UserName)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Email, new { @for = "txtEmail" })
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @placeholder = "example@gmail.com", @id = "txtEmail", type = "email", @readonly = "true" })
+        @Html.ValidationMessageFor(model => model.Email)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PostalCode, new { @for = "txtPostalCode" })
+        @Html.TextBoxFor(model => model.PostalCode, new { @class = "form-control", @id = "txtPostalCode", @maxlength = "30", @type = "number" })
+        @Html.ValidationMessageFor(model => model.PostalCode)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Street, new { @for = "txtStreet" })
+        @Html.TextBoxFor(model => model.Street, new { @class = "form-control", @id = "txtStreet", @maxlength = "50" })
+        @Html.ValidationMessageFor(model => model.Street)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Neighbourhood, new { @for = "txtNeighbourhood" })
+        @Html.TextBoxFor(model => model.Neighbourhood, new { @class = "form-control", @id = "txtNeighbourhood", @maxlength = "50" })
+        @Html.ValidationMessageFor(model => model.Neighbourhood)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.City, new { @for = "txtCity" })
+        @Html.TextBoxFor(model => model.City, new { @class = "form-control", @id = "txtCity", @maxlength = "50" })
+        @Html.ValidationMessageFor(model => model.City)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.State, new { @for = "txtState" })
+        @Html.TextBoxFor(model => model.State, new { @class = "form-control", @id = "txtState", @maxlength = "2" })
+        @Html.ValidationMessageFor(model => model.State)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Country, new { @for = "txtCountry" })
+        @Html.TextBoxFor(model => model.Country, new { @class = "form-control", @id = "txtCountry", @maxlength = "50" })
+        @Html.ValidationMessageFor(model => model.Country)
+    </div>
 
     <input type="submit" value="Update info" class="btn btn-success" />
-
-    <br />
-    @Html.ActionLink("Alterar Senha", "UpdatePassword", "UserProfile")
-
-
-    <br />
-    @Html.ActionLink("Desativar conta", $"DisableUser", "UserProfile")
 }
+
+<br />
+@Html.ActionLink("Alterar Senha", "UpdatePassword", "UserProfile")
+
+
+<br />
+@Html.ActionLink("Desativar conta", $"DisableUser", "UserProfile")
