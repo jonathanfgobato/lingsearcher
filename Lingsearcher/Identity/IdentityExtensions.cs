@@ -1,8 +1,8 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
 
-namespace Lingseacher.Identity
+namespace Lingsearcher.Identity
 {
     public static class IdentityExtensions
     {

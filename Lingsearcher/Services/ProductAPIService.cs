@@ -1,8 +1,9 @@
 ﻿using HtmlAgilityPack;
+using Lingsearcher.DAL;
+using Lingsearcher.Entity;
 using Lingsearcher.Models.API;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,27 +22,26 @@ namespace Lingsearcher.Services
             _store = store;
             _productId = productId;
         }
-        public string GetHtmlProductPage(string store = "", string productId = "")
+        public string GetHtmlProductPage(IEnumerable<Store> stores, string store = "", string productId = "")
         {
+            Store storeObj = null;
+
             if(!String.IsNullOrEmpty(store) && !String.IsNullOrEmpty(productId))
             {
                 _store = store;
                 _productId = productId;
             }
 
-            Dictionary<string, string> dictStore = new Dictionary<string, string>();
-            List<string> listStores = new List<string>() { "aliexpress", "dealextreme" };
+            storeObj = 
+                (from item in stores
+                 where item.Name.ToLower() == _store.ToLower()
+                 select item).SingleOrDefault();
 
-            if (!listStores.Contains(_store.ToLower()))
-            {
+            //Fazer a verificação de nome de loja nao encontrada
+            if(storeObj is null)
                 return String.Empty;
-            }
 
-            dictStore = (ConfigurationManager.GetSection($"StoreSettings/{_store}") as System.Collections.Hashtable)
-                .Cast<System.Collections.DictionaryEntry>()
-                .ToDictionary(n => n.Key.ToString(), n => n.Value.ToString());
-
-            string url = $"{dictStore["url"]}{_productId}.html";
+            string url = $"{storeObj.UrlProduct}{_productId}.html";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -64,8 +64,17 @@ namespace Lingsearcher.Services
             }
             return data;
         }
-        public Product GetProductInfo(Dictionary<string, string> dictStore, string htmlProductPage)
+        public Product GetProductInfo(IEnumerable<Store> stores, string htmlProductPage)
         {
+            Store storeObj = null;
+
+            storeObj =
+                (from item in stores
+                 where item.Name.ToLower() == _store.ToLower()
+                 select item).SingleOrDefault();
+
+            ProductPath productPath = new BaseDAO<ProductPath>().GetById(storeObj.ProductPathId);
+
             var doc = new HtmlDocument();
             doc.LoadHtml(htmlProductPage);
 
@@ -78,33 +87,33 @@ namespace Lingsearcher.Services
             */
 
             string minPrice =
-                doc.DocumentNode.SelectNodes(dictStore["minPrice"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["minPrice"]).InnerText
-                : doc.DocumentNode.SelectNodes(dictStore["minPricePromotion"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["minPricePromotion"]).InnerText
-                : doc.DocumentNode.SelectNodes(dictStore["uniquePricePromotion"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["uniquePricePromotion"]).InnerText
-                : doc.DocumentNode.SelectNodes(dictStore["uniquePrice"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["uniquePrice"]).InnerText
+                doc.DocumentNode.SelectNodes($"{productPath.MinPrice}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.MinPrice}text()").InnerText
+                : doc.DocumentNode.SelectNodes($"{productPath.MinPricePromotion}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.MinPricePromotion}text()").InnerText
+                : doc.DocumentNode.SelectNodes($"{productPath.UniquePricePromotion}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.UniquePricePromotion}text()").InnerText
+                : doc.DocumentNode.SelectNodes($"{productPath.UniquePrice}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.UniquePrice}text()").InnerText
                 : "Não encontrado";
 
             string maxPrice =
-                doc.DocumentNode.SelectNodes(dictStore["maxPrice"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["maxPrice"]).InnerText
-                : doc.DocumentNode.SelectNodes(dictStore["maxPricePromotion"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["maxPricePromotion"]).InnerText
+                doc.DocumentNode.SelectNodes($"{productPath.MaxPrice}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.MaxPrice}text()").InnerText
+                : doc.DocumentNode.SelectNodes($"{productPath.MaxPricePromotion}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.MaxPricePromotion}text()").InnerText
                 : String.Empty;
 
             string currency =
-                doc.DocumentNode.SelectNodes(dictStore["currency"]) != null
-                ? doc.DocumentNode.SelectSingleNode(dictStore["currency"]).InnerText
-                : doc.DocumentNode.SelectSingleNode(dictStore["currencyPromotion"]).InnerText;
+                doc.DocumentNode.SelectNodes($"{productPath.Currency}text()") != null
+                ? doc.DocumentNode.SelectSingleNode($"{productPath.Currency}text()").InnerText
+                : doc.DocumentNode.SelectSingleNode($"{productPath.CurrencyPromotion}text()").InnerText;
 
             Product product = new Product
             {
                 Id = _productId,
                 Store = _store,
-                FullName = doc.DocumentNode.SelectSingleNode(dictStore["productName"]).InnerText,
+                FullName = doc.DocumentNode.SelectSingleNode($"{productPath.FullName}text()").InnerText,
                 MinPrice = minPrice,
                 MaxPrice = maxPrice,
                 Currency = currency.Trim()

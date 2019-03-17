@@ -1,4 +1,4 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using Lingsearcher.DAL;
 using Lingsearcher.Entity;
 using Lingsearcher.ViewModels;

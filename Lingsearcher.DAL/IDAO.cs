@@ -1,4 +1,4 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

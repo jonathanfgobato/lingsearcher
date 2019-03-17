@@ -1,4 +1,4 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;

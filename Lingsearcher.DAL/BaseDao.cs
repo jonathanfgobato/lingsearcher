@@ -5,7 +5,7 @@ using Dapper;
 using System.Data;
 using System.Linq;
 using System;
-using Lingseacher.Entity;
+using Lingsearcher.Entity;
 
 namespace Lingsearcher.DAL
 {

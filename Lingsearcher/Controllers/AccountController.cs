@@ -1,4 +1,4 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Lingsearcher.ViewModels;
-using Lingseacher.Identity;
+using Lingsearcher.Identity;
 using log4net;
 using System;
 

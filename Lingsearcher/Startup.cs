@@ -1,4 +1,4 @@
-﻿using Lingseacher.Entity;
+﻿using Lingsearcher.Entity;
 using Lingsearcher;
 using Lingsearcher.App_Start.Identity;
 using Lingsearcher.Entity;

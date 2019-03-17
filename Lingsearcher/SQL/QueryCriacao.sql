@@ -13,7 +13,6 @@ CREATE TABLE [Address]
 )
 GO
 
-
 CREATE TABLE UserSystem
 (
 	Id BIGINT IDENTITY NOT NULL,
@@ -37,6 +36,34 @@ CREATE TABLE [LogException](
     [Exception] [varchar](2000) NULL,  
  CONSTRAINT PK_LogException PRIMARY KEY(Id)   
 )
+
+CREATE TABLE ProductPath
+(
+	Id						INT IDENTITY(1,1) NOT NULL			
+	,FullName				VARCHAR(100) NOT NULL
+	,Currency				VARCHAR(100) NOT NULL
+	,CurrencyPromotion		VARCHAR(100) NOT NULL
+	,MinPrice				VARCHAR(100) NOT NULL
+	,MinPricePromotion		VARCHAR(100) NOT NULL
+	,MaxPrice				VARCHAR(100) NOT NULL
+	,MaxPricePromotion		VARCHAR(100) NOT NULL
+	,UniquePrice			VARCHAR(100) NOT NULL
+	,UniquePricePromotion	VARCHAR(100) NOT NULL
+	,UrlImage				VARCHAR(100) NOT NULL
+	CONSTRAINT PK_ProductPath PRIMARY KEY(Id)
+)
+
+CREATE TABLE Store
+(
+	Id INT IDENTITY(1,1) NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+	UrlStore VARCHAR(50) NOT NULL,
+	UrlProduct VARCHAR(50) NOT NULL,
+	ProductPathId INT NOT NULL,
+	CONSTRAINT PK_Store_Id PRIMARY KEY(Id),
+	CONSTRAINT FK_Store_ProductPathId_ProductPath FOREIGN KEY(ProductPathId) REFERENCES ProductPath(Id)
+)
+
 
 SELECT * FROM LogException
 

@@ -111,3 +111,14 @@ BEGIN
 		,Neighbourhood = @Neighbourhood
 	WHERE Id = @Id
 END
+
+CREATE PROCEDURE Spr_Listar_Store
+AS
+BEGIN
+	SELECT
+		Id
+		,Name
+		,UrlStore
+		,UrlProduct
+		,ProductPathId
+END

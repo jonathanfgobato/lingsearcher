@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Lingseacher.Entity
+namespace Lingsearcher.Entity
 {
     public class UserApplication : IdentityUser
     {

@@ -1,4 +1,6 @@
-﻿using Lingsearcher.Models.API;
+﻿using Lingsearcher.DAL;
+using Lingsearcher.Entity;
+using Lingsearcher.Models.API;
 using Lingsearcher.Services;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,14 +16,18 @@ namespace Lingsearcher.Controllers
         [HttpGet]
         public Product GetProductInfo(string store, string productId)
         {
+            /*
             Dictionary<string, string> dictStore = new Dictionary<string, string>();
-            ProductAPIService productService = new ProductAPIService(store, productId);
 
             dictStore = (ConfigurationManager.GetSection($"StoreSettings/{store}") as System.Collections.Hashtable)
                 .Cast<System.Collections.DictionaryEntry>()
                 .ToDictionary(n => n.Key.ToString(), n => n.Value.ToString());
+            */
 
-            string htmlProductPage = productService.GetHtmlProductPage();
+            var stores = new BaseDAO<Store>().GetAll();
+            ProductAPIService productService = new ProductAPIService(store, productId);
+
+            string htmlProductPage = productService.GetHtmlProductPage(stores);
 
             //Caso não retorne nenhum html retorna o produto vazio
             if (string.IsNullOrEmpty(htmlProductPage))
@@ -29,7 +35,7 @@ namespace Lingsearcher.Controllers
                 return new Product();
             }
 
-            return productService.GetProductInfo(dictStore, htmlProductPage);
+            return productService.GetProductInfo(stores, htmlProductPage);
         }
     }
 }

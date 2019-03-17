@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 
-namespace Lingseacher.Entity
+namespace Lingsearcher.Entity
 {
     public abstract class Domain
     {
