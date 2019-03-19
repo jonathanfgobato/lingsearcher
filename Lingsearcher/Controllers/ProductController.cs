@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Lingsearcher.DAL;
+using Lingsearcher.Entity;
+using Lingsearcher.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +14,9 @@ namespace Lingsearcher.Controllers
         // GET: Product
         public ActionResult Index()
         {
+            BaseDAO<Product> productDAO = new BaseDAO<Product>();
+            ViewBag.AllProducts = (List<Product>)productDAO.GetAll(); ;
+
             return View();
         }
 
@@ -23,7 +29,31 @@ namespace Lingsearcher.Controllers
         // GET: Product/Create
         public ActionResult Create()
         {
-            return View();
+            var brands = (List<Brand>)new BaseDAO<Brand>().GetAll();
+            var categorys = (List<Category>)new BaseDAO<Category>().GetAll();
+
+            var model = new CreateProductViewModel
+            {
+                BrandId = brands.First().Id,
+                CategoryId = categorys.First().Id,
+
+                Brands = brands.Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                }),
+
+                Categorys = categorys.Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                })
+            };
+
+            //Adicionar campo de Id do produto de acordo com a quantidade de lojas
+
+
+            return View(model);
         }
 
         // POST: Product/Create

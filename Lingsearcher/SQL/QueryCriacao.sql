@@ -64,6 +64,42 @@ CREATE TABLE Store
 	CONSTRAINT FK_Store_ProductPathId_ProductPath FOREIGN KEY(ProductPathId) REFERENCES ProductPath(Id)
 )
 
+CREATE TABLE Category
+(
+	Id INT IDENTITY(1,1) NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+	CONSTRAINT PK_Category_Id PRIMARY KEY(Id)
+)
+
+CREATE TABLE Brand
+(
+	Id SMALLINT IDENTITY(1,1) NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+	CONSTRAINT PK_Brand_Id PRIMARY KEY(Id)
+)
+
+CREATE TABLE Product
+(
+	Id INT IDENTITY(1,1) NOT NULL,
+	Name VARCHAR(50) NOT NULL,
+	Description VARCHAR(4000),
+	CategoryId INT NOT NULL,
+	ImageSrc VARCHAR(50) NOT NULL,
+	BrandId SMALLINT NOT NULL,
+	CONSTRAINT PK_Product_Id PRIMARY KEY (Id),
+	CONSTRAINT FK_Product_CategoryId FOREIGN KEY (CategoryId) REFERENCES Category(Id),
+	CONSTRAINT FK_Brand_BrandId FOREIGN KEY (BrandId) REFERENCES Brand(Id)
+)
+
+CREATE TABLE ProductStore
+(
+	ProductId INT NOT NULL,
+	StoreId INT NOT NULL,
+	ProductStoreId INT NOT NULL,
+	CONSTRAINT PK_ProductStore_ProductId_StoreId PRIMARY KEY(ProductId, StoreId),
+	CONSTRAINT FK_ProductStore_ProductId FOREIGN KEY (ProductId) REFERENCES Product(Id),
+	CONSTRAINT FK_ProductStore_StoreId FOREIGN KEY (StoreId) REFERENCES Store(Id),
+)
 
 SELECT * FROM LogException
 

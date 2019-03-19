@@ -121,4 +121,118 @@ BEGIN
 		,UrlStore
 		,UrlProduct
 		,ProductPathId
+	FROM Store
+END
+
+CREATE PROCEDURE Spr_Buscar_ProductPath_PorId
+	@Id INT
+AS
+BEGIN
+	SELECT
+		Id
+		,FullName			
+		,Currency			
+		,CurrencyPromotion	
+		,MinPrice			
+		,MinPricePromotion	
+		,MaxPrice			
+		,MaxPricePromotion	
+		,UniquePrice		
+		,UniquePricePromotion
+		,UrlImage	
+	FROM ProductPath
+	WHERE Id = @Id		
+END
+
+CREATE PROCEDURE Spr_Buscar_Product_PorId
+	@Id INT
+AS
+BEGIN
+	SELECT
+		Id
+		,Name
+		,Description
+		,CategoryId
+		,ImageSrc
+		,BrandId
+	FROM Product
+	WHERE Id = @Id
+END
+
+CREATE PROCEDURE Spr_Listar_Product
+AS
+BEGIN
+	SELECT
+		Id
+		,Name
+		,Description
+		,CategoryId
+		,ImageSrc
+		,BrandId
+	FROM Product
+END
+
+CREATE PROCEDURE Spr_Insert_Product
+		@Name VARCHAR(50)
+		,@Description VARCHAR(4000)
+		,@CategoryId INT
+		,@BrandId INT
+		,@ImageSrc VARCHAR(50) = ''
+AS
+BEGIN
+	INSERT INTO Product
+	(
+		Name
+		,Description
+		,CategoryId
+		,ImageSrc
+		,BrandId
+	)
+	VALUES
+	(
+		@Name
+		,@Description
+		,@CategoryId
+		,@ImageSrc
+		,@BrandId
+	)
+	SELECT @@IDENTITY
+END
+
+CREATE PROCEDURE Spr_Alterar_Product
+	@Id INT
+	,@Name VARCHAR(50)
+	,@Description VARCHAR(4000)
+	,@CategoryId INT
+	,@BrandId INT
+	,@ImageSrc VARCHAR(50) = ''
+AS
+BEGIN
+	UPDATE Product
+	SET
+		Name = @Name
+		,Description = @Description
+		,CategoryId = @CategoryId
+		,BrandId = @BrandId
+		,ImageSrc = @ImageSrc
+	WHERE Id = @Id
+END
+
+
+CREATE PROCEDURE Spr_Listar_Brand
+AS
+BEGIN
+	SELECT
+		Id
+		,Name
+	FROM Brand
+END
+
+CREATE PROCEDURE Spr_Listar_Category
+AS
+BEGIN
+	SELECT
+		Id
+		,Name
+	FROM Category
 END

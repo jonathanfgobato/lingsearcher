@@ -14,7 +14,7 @@ namespace Lingsearcher.Controllers
     {
         [AcceptVerbs("GET")]
         [HttpGet]
-        public Product GetProductInfo(string store, string productId)
+        public ProductAPI GetProductInfo(string store, string productId)
         {
             /*
             Dictionary<string, string> dictStore = new Dictionary<string, string>();
@@ -32,7 +32,7 @@ namespace Lingsearcher.Controllers
             //Caso não retorne nenhum html retorna o produto vazio
             if (string.IsNullOrEmpty(htmlProductPage))
             {
-                return new Product();
+                return new ProductAPI();
             }
 
             return productService.GetProductInfo(stores, htmlProductPage);

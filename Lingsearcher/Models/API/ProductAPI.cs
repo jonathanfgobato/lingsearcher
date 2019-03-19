@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Lingsearcher.Models.API
 {
-    public class Product
+    public class ProductAPI
     {
         public string Id { get; set; }
         public string Store { get; set; }

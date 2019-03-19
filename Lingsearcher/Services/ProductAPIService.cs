@@ -32,8 +32,8 @@ namespace Lingsearcher.Services
                 _productId = productId;
             }
 
-            storeObj = 
-                (from item in stores
+            storeObj = (
+                 from item in stores
                  where item.Name.ToLower() == _store.ToLower()
                  select item).SingleOrDefault();
 
@@ -64,7 +64,7 @@ namespace Lingsearcher.Services
             }
             return data;
         }
-        public Product GetProductInfo(IEnumerable<Store> stores, string htmlProductPage)
+        public ProductAPI GetProductInfo(IEnumerable<Store> stores, string htmlProductPage)
         {
             Store storeObj = null;
 
@@ -109,7 +109,7 @@ namespace Lingsearcher.Services
                 ? doc.DocumentNode.SelectSingleNode($"{productPath.Currency}text()").InnerText
                 : doc.DocumentNode.SelectSingleNode($"{productPath.CurrencyPromotion}text()").InnerText;
 
-            Product product = new Product
+            ProductAPI product = new ProductAPI
             {
                 Id = _productId,
                 Store = _store,

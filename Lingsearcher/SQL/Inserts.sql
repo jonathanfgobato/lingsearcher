@@ -89,3 +89,9 @@ SELECT
 FROM Store AS A
 	INNER JOIN ProductPath AS B
 	ON A.ProductPathId = B.Id
+
+INSERT INTO Brand VALUES('Xiaomi'), ('Apple')
+
+INSERT INTO Category VALUES('Smartphone'), ('Tablets')
+
+SELECT * FROM Brand
