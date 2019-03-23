@@ -30,8 +30,8 @@
             <td>@item.Id</td>
             <td>@item.Name</td>
             <td>@item.Description</td>
-            <td></td>
-            <td></td>
+            <td><a href="@Url.Action("Edit", "Product", new { id = item.Id})"><i style="color:black;" class="fas fa-pencil-alt"></i></a></td>
+            <td><a href="@Url.Action("Delete", "Product", new { id = item.Id })"><i style="color:black;" class="fas fa-eraser"></i></a></td>
         </tr>
     }
 </table>

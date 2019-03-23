@@ -10,7 +10,7 @@ namespace Lingsearcher.Entity
     {
         public int ProductId { get; set; }
         public int StoreId { get; set; }
-        public int ProductStoreId { get; set; }
+        public string ProductStoreId { get; set; }
         public Store Store { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Lingsearcher.Entity;
 using Lingsearcher.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -29,8 +30,9 @@ namespace Lingsearcher.Controllers
         // GET: Product/Create
         public ActionResult Create()
         {
-            var brands = (List<Brand>)new BaseDAO<Brand>().GetAll();
-            var categorys = (List<Category>)new BaseDAO<Category>().GetAll();
+            List<Brand> brands = (List<Brand>)new BaseDAO<Brand>().GetAll();
+            List<Category> categorys = (List<Category>)new BaseDAO<Category>().GetAll();
+            List<Store> stores = (List<Store>)new BaseDAO<Store>().GetAll();
 
             var model = new CreateProductViewModel
             {
@@ -51,41 +53,180 @@ namespace Lingsearcher.Controllers
             };
 
             //Adicionar campo de Id do produto de acordo com a quantidade de lojas
-
+            ViewBag.ProductStore = stores;
 
             return View(model);
         }
 
         // POST: Product/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(CreateProductViewModel model)
         {
             try
             {
-                // TODO: Add insert logic here
+                if(ModelState.IsValid)
+                {
+                    var file = Request.Files["Image"];
+                    string fname = String.Empty;
+                    string fullPath = String.Empty;
+
+                    //Checa se o arquivo foi enviado
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        fname = Path.GetFileName(file.FileName);
+                        fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        file.SaveAs(fullPath);
+                    }
+
+                    model.ImageSrc = fullPath;
+
+                    //Inserir produto
+                    var newProduct = new Product
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        CategoryId = model.CategoryId,
+                        BrandId = model.BrandId,
+                        ImageSrc = model.ImageSrc
+                    };
+
+                    Product product = new BaseDAO<Product>().Insert(newProduct);
+
+                    //Varre o array de productStore e insere de acordo
+                    //com o id do produto inserido e da loja
+
+                    var stores = (List<Store>)new BaseDAO<Store>().GetAll();
+                    BaseDAO<ProductStore> productStoreDAO = new BaseDAO<ProductStore>();
+
+                    for(int i = 0; i < model.ProductStore.Length; i++)
+                    {
+                        var newProductStore = new ProductStore
+                        {
+                            ProductId = product.Id,
+                            StoreId = stores[i].Id,
+                            ProductStoreId = model.ProductStore[i]
+                        };
+                        productStoreDAO.Insert(newProductStore);
+                    }
+                }
 
                 return RedirectToAction("Index");
             }
-            catch
+            catch(Exception ex)
             {
                 return View();
             }
         }
 
         // GET: Product/Edit/5
+        [HttpGet]
         public ActionResult Edit(int id)
         {
-            return View();
+            Product product = new BaseDAO<Product>().GetById(id);
+            List<Category> categorys = (List<Category>)new BaseDAO<Category>().GetAll();
+            List<Brand> brands = (List<Brand>)new BaseDAO<Brand>().GetAll();
+            List<Store> stores = (List<Store>)new BaseDAO<Store>().GetAll();
+
+            //Busca de lista de product Store
+            List<ProductStore> listProductStore = (List<ProductStore>)new ProductStoreDAO().GetByProductId(id);
+
+            //Criação da view model
+            EditProductViewModel model = new EditProductViewModel
+            {
+                ProductId = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                BrandId = product.BrandId,
+                CategoryId = product.CategoryId,
+                ImageSrc = product.ImageSrc,
+
+                Brands = brands.Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                }),
+
+                Categorys = categorys.Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                })
+
+            };
+
+            int cont = 0;
+            model.ProductStore = new string[listProductStore.Count()];
+
+            //Setar os valores de ProductStore no array de string
+            foreach (var item in listProductStore)
+            {
+                model.ProductStore[cont] = item.ProductStoreId;
+                cont++;
+            }
+
+            ViewBag.ProductStore = stores;
+
+            //Devolver para a view com os dados preenchidos
+            return View(model);
         }
 
         // POST: Product/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(EditProductViewModel model)
         {
             try
             {
-                // TODO: Add update logic here
+                if (ModelState.IsValid)
+                {
+                    var file = Request.Files["Image"];
+                    string fname = String.Empty;
+                    string fullPath = String.Empty;
 
+                    //Checa se o arquivo foi enviado
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        //Caso exista alguma imagem atrelada, apaga antes de subir a nova
+                        System.IO.File.Delete(model.ImageSrc);
+
+                        fname = Path.GetFileName(file.FileName);
+                        fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        file.SaveAs(fullPath);
+                        model.ImageSrc = fullPath;
+                    }
+
+                    //Atualiza produto
+                    var newProduct = new Product
+                    {
+                        Id = model.ProductId,
+                        Name = model.Name,
+                        Description = model.Description,
+                        CategoryId = model.CategoryId,
+                        BrandId = model.BrandId,
+                        ImageSrc = model.ImageSrc
+                    };
+
+                    new BaseDAO<Product>().Update(newProduct);
+
+                    //Deleta todo o mapeamento de ProductId com ProductStore
+                    var productStoreDao = new ProductStoreDAO().Delete(newProduct.Id);
+
+                    //Varre o array de productStore e insere de acordo
+                    //com o id do produto inserido e da loja
+
+                    var stores = (List<Store>)new BaseDAO<Store>().GetAll();
+                    BaseDAO<ProductStore> productStoreDAO = new BaseDAO<ProductStore>();
+
+                    for (int i = 0; i < model.ProductStore.Length; i++)
+                    {
+                        var newProductStore = new ProductStore
+                        {
+                            ProductId = newProduct.Id,
+                            StoreId = stores[i].Id,
+                            ProductStoreId = model.ProductStore[i]
+                        };
+                        productStoreDAO.Insert(newProductStore);
+                    }
+                }
                 return RedirectToAction("Index");
             }
             catch
@@ -97,23 +238,19 @@ namespace Lingsearcher.Controllers
         // GET: Product/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
-        }
+            var productDAO = new BaseDAO<Product>();
+            Product product = productDAO.GetById(id);
 
-        // POST: Product/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
+            //Deletar imagem
+            System.IO.File.Delete(product.ImageSrc);
 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            //Deletar product store
+            new BaseDAO<ProductStore>().Delete(id);
+
+            //Deletar produto
+            productDAO.Delete(id);
+
+            return RedirectToAction("Index");
         }
     }
 }

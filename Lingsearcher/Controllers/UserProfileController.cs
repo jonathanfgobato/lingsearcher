@@ -1,6 +1,5 @@
 ﻿using Lingsearcher.Entity;
 using Lingsearcher.DAL;
-using Lingsearcher.Entity;
 using Lingsearcher.ViewModels;
 using System;
 using System.Web;

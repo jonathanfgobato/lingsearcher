@@ -172,12 +172,12 @@ BEGIN
 	FROM Product
 END
 
-CREATE PROCEDURE Spr_Insert_Product
+ALTER PROCEDURE Spr_Insert_Product
 		@Name VARCHAR(50)
 		,@Description VARCHAR(4000)
 		,@CategoryId INT
 		,@BrandId INT
-		,@ImageSrc VARCHAR(50) = ''
+		,@ImageSrc VARCHAR(255) = ''
 AS
 BEGIN
 	INSERT INTO Product
@@ -199,13 +199,13 @@ BEGIN
 	SELECT @@IDENTITY
 END
 
-CREATE PROCEDURE Spr_Alterar_Product
+ALTER PROCEDURE Spr_Alterar_Product
 	@Id INT
 	,@Name VARCHAR(50)
 	,@Description VARCHAR(4000)
 	,@CategoryId INT
 	,@BrandId INT
-	,@ImageSrc VARCHAR(50) = ''
+	,@ImageSrc VARCHAR(255) = ''
 AS
 BEGIN
 	UPDATE Product
@@ -235,4 +235,49 @@ BEGIN
 		Id
 		,Name
 	FROM Category
+END
+
+SELECT * FROM Product
+
+SELECT * FROM ProductStore
+
+ALTER PROCEDURE Spr_Insert_ProductStore
+	@ProductId INT
+	,@StoreId INT
+	,@ProductStoreId VARCHAR(30)
+AS
+BEGIN
+	INSERT INTO ProductStore
+	(
+		ProductId
+		,StoreId
+		,ProductStoreId
+	)
+	VALUES
+	(
+		@ProductId
+		,@StoreId
+		,@ProductStoreId
+	)
+END
+
+CREATE PROCEDURE Spr_Listar_ProductStore_PorProductId
+	@ProductId INT
+AS
+BEGIN
+	SELECT
+		ProductId
+		,StoreId
+		,ProductStoreId
+	FROM ProductStore
+	WHERE ProductId = @ProductId
+END
+
+EXEC Spr_Listar_ProductStore_PorProductId 10
+
+CREATE PROCEDURE Spr_Excluir_ProductStore
+	@Id INT
+AS
+BEGIN
+	DELETE FROM ProductStore WHERE ProductId = @Id
 END

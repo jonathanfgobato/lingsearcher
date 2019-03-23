@@ -84,7 +84,7 @@ CREATE TABLE Product
 	Name VARCHAR(50) NOT NULL,
 	Description VARCHAR(4000),
 	CategoryId INT NOT NULL,
-	ImageSrc VARCHAR(50) NOT NULL,
+	ImageSrc VARCHAR(100) NOT NULL,
 	BrandId SMALLINT NOT NULL,
 	CONSTRAINT PK_Product_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Product_CategoryId FOREIGN KEY (CategoryId) REFERENCES Category(Id),
@@ -95,11 +95,12 @@ CREATE TABLE ProductStore
 (
 	ProductId INT NOT NULL,
 	StoreId INT NOT NULL,
-	ProductStoreId INT NOT NULL,
+	ProductStoreId VARCHAR(30) NOT NULL,
 	CONSTRAINT PK_ProductStore_ProductId_StoreId PRIMARY KEY(ProductId, StoreId),
 	CONSTRAINT FK_ProductStore_ProductId FOREIGN KEY (ProductId) REFERENCES Product(Id),
 	CONSTRAINT FK_ProductStore_StoreId FOREIGN KEY (StoreId) REFERENCES Store(Id),
 )
+
 
 SELECT * FROM LogException
 

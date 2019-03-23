@@ -1,4 +1,5 @@
 ﻿@model Lingsearcher.ViewModels.CreateProductViewModel
+@using Lingsearcher.Entity
 @{
     ViewBag.Title = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,7 +15,7 @@
     </div>
 }
 
-@using (Html.BeginForm("Create", "Product"))
+@using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="form-group">
         @Html.LabelFor(model => model.Name, new { @for = "txtName" })
@@ -24,8 +25,14 @@
 
     <div class="form-group">
         @Html.LabelFor(model => model.Description, new { @for = "txtDescription" })
-        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "Description", @id = "txtDescription", @maxlength = "50" })
+        @Html.TextBoxFor(model => model.Description, new { @class = "form-control", @placeholder = "Description", @id = "txtDescription", @maxlength = "50" })
         @Html.ValidationMessageFor(model => model.Description)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Image, new { @for = "txtImage" })
+        @Html.TextBoxFor(model => model.Image, new { @class = "form-control-file", type = "file" })
+        @Html.ValidationMessageFor(model => model.Image)
     </div>
 
     <div class="form-group">
@@ -46,6 +53,14 @@
             new SelectList(Model.Brands, "Value", "Text"), new { @class = "form-control"})
 
         @Html.ValidationMessageFor(x => x.BrandId)
+    </div>
+
+    <div class="form-group">
+        @foreach(Store item in ViewBag.ProductStore)
+        {
+            @Html.Raw($"<label for='ProductStore[{@item.Id}]'>Id do produto {item.Name}</label>")
+            <input type="text" id="ProductStore[@item.Id]" name="ProductStore" class="form-control">
+        }
     </div>
 
     <div class="form-group">

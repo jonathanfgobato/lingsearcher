@@ -7,8 +7,9 @@ using System.Web.Mvc;
 
 namespace Lingsearcher.ViewModels
 {
-    public class CreateProductViewModel
+    public class EditProductViewModel
     {
+        public int ProductId { get; set; }
         [Required]
         [Display(Name = "Nome do produto")]
         public string Name { get; set; }
@@ -28,7 +29,6 @@ namespace Lingsearcher.ViewModels
         [Required]
         public string[] ProductStore { get; set; }
         public string ImageSrc { get; set; }
-        [Required]
         public HttpPostedFileBase Image { get; set; }
     }
 }
