@@ -74,7 +74,9 @@ namespace Lingsearcher.Controllers
                     if (file != null && file.ContentLength > 0)
                     {
                         fname = Path.GetFileName(file.FileName);
-                        fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        //fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        fullPath = Path.Combine(Environment.GetFolderPath(
+                                        Environment.SpecialFolder.ApplicationData), fname);
                         file.SaveAs(fullPath);
                     }
 
