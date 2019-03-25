@@ -2,7 +2,16 @@
     ViewBag.Title = "Home Page";
 }
 
+<hr />
+@using (Html.BeginForm("Search", "Home", FormMethod.Get))
+{
+    @Html.TextBox("strFilter", null, new { @class = "form-control", @placeholder = "Type something to search..." })
+    <input type="submit" class="btn" value="Search">
+}
+<hr />
+
 <div class="jumbotron">
+
 
 </div>
 

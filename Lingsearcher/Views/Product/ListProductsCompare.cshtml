@@ -1,0 +1,47 @@
+﻿@model Lingsearcher.ViewModels.SearchProductsViewModel
+@{
+    ViewBag.Title = "ListProductsCompare";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ListProductsCompare</h2>
+
+<script>
+    $(document).ready( function () {
+        $('#listProductsCompare').DataTable();
+    });
+</script>
+
+@*
+    @foreach(var item in Model.ProductsAPI)
+    {
+        <div class="row">
+            <a href="@item.ProductUrl"><img src="~/App_Data/@Model.ImageSrc" alt="Product Image" width="200px" height="200px" /></a>
+            <h4>@item.FullName</h4>
+            <h5>Store: @item.Store</h5>
+            Price range: @item.Currency @item.PriceRange
+            <a href="@item.ProductUrl" class="btn btn-info">Go to store</a>
+        </div>
+    }
+*@
+<table id="listProductsCompare" class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Store</th>
+            <th>Price range</th>
+            <th>Go</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.ProductsAPI)
+    {
+        <tr>
+            <td><a href="@item.ProductUrl"><img src="~/App_Data/@Model.ImageSrc" alt="Product Image" width="150px" height="150px" /></a></td>
+            <td>@Model.NameProduct</td>
+            <td>@item.Store</td>
+            <td>@item.Currency @item.PriceRange</td>
+            <td><a href="@item.ProductUrl" class="btn btn-info">Go to store</a></td>
+        </tr>
+    }
+</table>

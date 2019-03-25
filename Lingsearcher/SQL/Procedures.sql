@@ -281,3 +281,50 @@ AS
 BEGIN
 	DELETE FROM ProductStore WHERE ProductId = @Id
 END
+
+CREATE PROCEDURE Spr_Excluir_Product
+	@Id INT
+AS
+BEGIN
+	DELETE FROM Product WHERE Id = @Id
+END
+
+
+CREATE PROCEDURE Spr_Buscar_Brand_PorId
+	@Id SMALLINT
+AS
+BEGIN
+	SELECT 
+		Id
+		,Name
+	FROM Brand
+	WHERE Id = @Id
+END
+
+ALTER PROCEDURE Spr_Buscar_Category_PorId
+	@Id SMALLINT
+AS
+BEGIN
+	SELECT 
+		Id
+		,Name
+	FROM Category
+	WHERE Id = @Id
+END
+
+CREATE PROCEDURE Spr_Buscar_Store_PorId
+	@Id INT
+AS
+BEGIN
+	SELECT 
+		Id
+		,Name
+		,UrlStore
+		,UrlProduct
+		,ProductPathId
+	FROM Store
+	WHERE Id = @Id
+END
+
+
+SELECT * FROM Product

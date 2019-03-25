@@ -220,11 +220,14 @@
     <Compile Include="ViewModels\CreateProductViewModel.cs" />
     <Compile Include="ViewModels\DisableUserViewModel.cs" />
     <Compile Include="ViewModels\EditProductViewModel.cs" />
+    <Compile Include="ViewModels\SearchProductsViewModel.cs" />
     <Compile Include="ViewModels\UpdatePasswordViewModel.cs" />
     <Compile Include="ViewModels\UpdateUserProfileViewModel.cs" />
     <Compile Include="ViewModels\UserRegisterViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\iphonex.jpg" />
+    <Content Include="App_Data\xiaomi_mi8.jpg" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -441,10 +444,10 @@
     <Content Include="Views\Product\Details.cshtml" />
     <Content Include="Views\Product\Edit.cshtml" />
     <Content Include="Views\Product\Index.cshtml" />
+    <Content Include="Views\Product\ListProductsSearch.cshtml" />
+    <Content Include="Views\Product\ListProductsCompare.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />

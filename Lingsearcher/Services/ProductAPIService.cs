@@ -4,10 +4,12 @@ using Lingsearcher.Entity;
 using Lingsearcher.Models.API;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace Lingsearcher.Services
@@ -15,11 +17,20 @@ namespace Lingsearcher.Services
     public class ProductAPIService
     {
         private string _store;
-        private string _productId;
+        private string _productStoreId;
+        private int _productId;
+        private string _productUrl;
 
-        public ProductAPIService(string store, string productId)
+        public ProductAPIService(string store, string productStoreId)
         {
             _store = store;
+            _productStoreId = productStoreId;
+        }
+
+        public ProductAPIService(string store, string productStoreId, int productId)
+        {
+            _store = store;
+            _productStoreId = productStoreId;
             _productId = productId;
         }
         public string GetHtmlProductPage(IEnumerable<Store> stores, string store = "", string productId = "")
@@ -29,19 +40,19 @@ namespace Lingsearcher.Services
             if(!String.IsNullOrEmpty(store) && !String.IsNullOrEmpty(productId))
             {
                 _store = store;
-                _productId = productId;
+                _productStoreId = productId;
             }
 
-            storeObj = (
-                 from item in stores
-                 where item.Name.ToLower() == _store.ToLower()
-                 select item).SingleOrDefault();
+            storeObj = (from item in stores
+                        where item.Name.ToLower() == _store.ToLower()
+                        select item).SingleOrDefault();
 
             //Fazer a verificação de nome de loja nao encontrada
             if(storeObj is null)
                 return String.Empty;
 
-            string url = $"{storeObj.UrlProduct}{_productId}.html";
+            string url = $"{storeObj.UrlProduct}{_productStoreId}.html";
+            _productUrl = url;
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -109,14 +120,39 @@ namespace Lingsearcher.Services
                 ? doc.DocumentNode.SelectSingleNode($"{productPath.Currency}text()").InnerText
                 : doc.DocumentNode.SelectSingleNode($"{productPath.CurrencyPromotion}text()").InnerText;
 
+            //minPrice = minPrice.Remove(minPrice.Length - 3, 1).Insert(minPrice.Length - 3, ",");
+            //maxPrice = minPrice.Remove(maxPrice.Length - 3, 1).Insert(maxPrice.Length - 3, ",");
+            double minPriceNumber, maxPriceNumber;
+
+            //minPriceNumber = Convert.ToDouble(minPrice);
+            //maxPriceNumber = Convert.ToDouble(maxPrice);
+            //var minPriceNumber = double.Parse(minPrice, CultureInfo.InvariantCulture);
+
+            CultureInfo info = new CultureInfo("pt-BR");
+            info.NumberFormat.NumberDecimalSeparator = ",";
+            Thread.CurrentThread.CurrentCulture = info;
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+
+            minPriceNumber = Convert.ToDouble(minPrice.Remove(minPrice.Length - 3, 1).Insert(minPrice.Length - 3, ","));
+
+            if (!String.IsNullOrEmpty(maxPrice))
+            {
+                maxPriceNumber = Convert.ToDouble(maxPrice.Remove(maxPrice.Length - 3, 1).Insert(maxPrice.Length - 3, ","));
+            }
+            else
+            {
+                maxPriceNumber = minPriceNumber;
+            }
             ProductAPI product = new ProductAPI
             {
-                Id = _productId,
+                Id = _productStoreId,
                 Store = _store,
                 FullName = doc.DocumentNode.SelectSingleNode($"{productPath.FullName}text()").InnerText,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                Currency = currency.Trim()
+                MinPrice = minPriceNumber,
+                MaxPrice = maxPriceNumber,
+                Currency = currency.Trim(),
+                ProductId = _productId,
+                ProductUrl = _productUrl
                 //ImageUrl = doc.DocumentNode.SelectSingleNode(dictStore["imageUrl"]).GetAttributeValue("src", null)
             };
 

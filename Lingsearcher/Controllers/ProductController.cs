@@ -13,6 +13,7 @@ namespace Lingsearcher.Controllers
     public class ProductController : Controller
     {
         // GET: Product
+        [Authorize]
         public ActionResult Index()
         {
             BaseDAO<Product> productDAO = new BaseDAO<Product>();
@@ -22,6 +23,7 @@ namespace Lingsearcher.Controllers
         }
 
         // GET: Product/Details/5
+        [Authorize]
         public ActionResult Details(int id)
         {
             return View();
@@ -60,6 +62,7 @@ namespace Lingsearcher.Controllers
 
         // POST: Product/Create
         [HttpPost]
+        [Authorize]
         public ActionResult Create(CreateProductViewModel model)
         {
             try
@@ -75,12 +78,12 @@ namespace Lingsearcher.Controllers
                     {
                         fname = Path.GetFileName(file.FileName);
                         //fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
-                        fullPath = Path.Combine(Environment.GetFolderPath(
-                                        Environment.SpecialFolder.ApplicationData), fname);
+                        //fullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fname);
+                        fullPath = $@"{HttpContext.ApplicationInstance.Server.MapPath("~/App_Data")}/{fname}";
                         file.SaveAs(fullPath);
                     }
 
-                    model.ImageSrc = fullPath;
+                    model.ImageSrc = fname;
 
                     //Inserir produto
                     var newProduct = new Product
@@ -122,6 +125,7 @@ namespace Lingsearcher.Controllers
 
         // GET: Product/Edit/5
         [HttpGet]
+        [Authorize]
         public ActionResult Edit(int id)
         {
             Product product = new BaseDAO<Product>().GetById(id);
@@ -174,6 +178,7 @@ namespace Lingsearcher.Controllers
 
         // POST: Product/Edit/5
         [HttpPost]
+        [Authorize]
         public ActionResult Edit(EditProductViewModel model)
         {
             try
@@ -188,12 +193,14 @@ namespace Lingsearcher.Controllers
                     if (file != null && file.ContentLength > 0)
                     {
                         //Caso exista alguma imagem atrelada, apaga antes de subir a nova
-                        System.IO.File.Delete(model.ImageSrc);
-
+                        //System.IO.File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), model.ImageSrc));
+                        System.IO.File.Delete($@"{HttpContext.ApplicationInstance.Server.MapPath("~/App_Data")}/{model.ImageSrc}");
                         fname = Path.GetFileName(file.FileName);
-                        fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        //fullPath = Server.MapPath(Path.Combine("~/App_Data/", fname));
+                        //Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fname);
+                        fullPath = $@"{HttpContext.ApplicationInstance.Server.MapPath("~/App_Data")}/{fname}";
                         file.SaveAs(fullPath);
-                        model.ImageSrc = fullPath;
+                        model.ImageSrc = fname;
                     }
 
                     //Atualiza produto
@@ -238,13 +245,16 @@ namespace Lingsearcher.Controllers
         }
 
         // GET: Product/Delete/5
+        [Authorize]
         public ActionResult Delete(int id)
         {
             var productDAO = new BaseDAO<Product>();
             Product product = productDAO.GetById(id);
 
             //Deletar imagem
-            System.IO.File.Delete(product.ImageSrc);
+            //System.IO.File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), product.ImageSrc));
+
+            System.IO.File.Delete($@"{HttpContext.ApplicationInstance.Server.MapPath("~/App_Data")}/{product.ImageSrc}");
 
             //Deletar product store
             new BaseDAO<ProductStore>().Delete(id);
@@ -254,5 +264,13 @@ namespace Lingsearcher.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public ActionResult ListProductsCompare(string json)
+        {
+            var model = Newtonsoft.Json.JsonConvert.DeserializeObject<SearchProductsViewModel>(json);
+            return View(model);
+        }
+
     }
 }
