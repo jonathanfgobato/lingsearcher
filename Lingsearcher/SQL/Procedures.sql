@@ -261,7 +261,7 @@ BEGIN
 	)
 END
 
-CREATE PROCEDURE Spr_Listar_ProductStore_PorProductId
+ALTER PROCEDURE Spr_Listar_ProductStore_PorProductId
 	@ProductId INT
 AS
 BEGIN
@@ -269,6 +269,9 @@ BEGIN
 		ProductId
 		,StoreId
 		,ProductStoreId
+		,LastMinPrice
+		,LastMaxPrice
+		,Currency
 	FROM ProductStore
 	WHERE ProductId = @ProductId
 END
@@ -326,5 +329,33 @@ BEGIN
 	WHERE Id = @Id
 END
 
+CREATE PROCEDURE Spr_Listar_ProductStore
+AS
+BEGIN
+	SELECT * FROM ProductStore
+END
 
-SELECT * FROM Product
+
+CREATE PROCEDURE Spr_AtualizarPrecos_ProductStore
+	 @ProductId INT
+	,@StoreId INT
+	,@LastMinPrice NUMERIC(7,2)
+	,@LastMaxPrice NUMERIC(7, 2)
+	,@Currency CHAR(2)
+AS
+BEGIN
+	UPDATE ProductStore SET
+		LastMinPrice = @LastMinPrice
+		,LastMaxPrice = @LastMaxPrice
+		,Currency = @Currency
+	WHERE
+		ProductId = @ProductId AND
+		StoreId = @StoreId
+END
+
+	UPDATE ProductStore SET
+		LastMinPrice = null
+		,LastMaxPrice = null
+		,Currency = null
+
+SELECT * FROM ProductStore

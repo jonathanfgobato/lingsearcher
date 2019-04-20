@@ -1,12 +1,11 @@
-﻿using Lingsearcher.DAL;
-using Lingsearcher.Entity;
-using Lingsearcher.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using System.Collections.Generic;
+using Lingsearcher.DAL;
+using Lingsearcher.Entity;
+using Lingsearcher.ViewModels;
 
 namespace Lingsearcher.Controllers
 {

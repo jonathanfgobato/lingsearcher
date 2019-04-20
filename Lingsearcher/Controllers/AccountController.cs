@@ -77,7 +77,6 @@ namespace Lingsearcher.Controllers
                 try
                 {
 
-
                     // Instanciação de uma nova classe UserApplication com os parâmetros pegos da RegisterViewModel
                     var newUser = new UserApplication
                     {
@@ -152,8 +151,6 @@ namespace Lingsearcher.Controllers
             {
                 try
                 {
-
-
                     // Realizar login pelo Identity
                     //var user = await UserManager.FindByEmailAsync(model.Email);
 
@@ -216,8 +213,6 @@ namespace Lingsearcher.Controllers
             {
                 try
                 {
-
-
                     var user = await UserManager.FindByEmailAsync(model.Email);
 
                     if (user != null)

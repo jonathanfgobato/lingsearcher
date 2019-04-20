@@ -39,7 +39,7 @@ CREATE TABLE [LogException](
 
 CREATE TABLE ProductPath
 (
-	Id						INT IDENTITY(1,1) NOT NULL			
+	 Id						INT IDENTITY(1,1) NOT NULL			
 	,FullName				VARCHAR(100) NOT NULL
 	,Currency				VARCHAR(100) NOT NULL
 	,CurrencyPromotion		VARCHAR(100) NOT NULL
@@ -102,6 +102,15 @@ CREATE TABLE ProductStore
 )
 
 
-SELECT * FROM ProductStore
+ALTER TABLE ProductStore
+	ADD 
+		LastMinPrice NUMERIC(7, 2),
+		LastMaxPrice NUMERIC (7,2),
+		Currency CHAR(2)
+
+SELECT * FROM ProductStore	
 
 SELECT * FROM Product
+
+DROP TABLE ProductStore
+DROP TABLE Product

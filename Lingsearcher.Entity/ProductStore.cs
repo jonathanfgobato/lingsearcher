@@ -12,5 +12,8 @@ namespace Lingsearcher.Entity
         public int StoreId { get; set; }
         public string ProductStoreId { get; set; }
         public Store Store { get; set; }
+        public double LastMinPrice { get; set; }
+        public double LastMaxPrice { get; set; }
+        public string Currency { get; set; }
     }
 }

@@ -256,7 +256,6 @@ namespace Lingsearcher.Controllers
             return View();
         }
 
-
         private void AddErrors(IdentityResult result)
         {
             // Retorna todos os erros através da model state

@@ -1,7 +1,5 @@
 ﻿using Lingsearcher.Entity;
-using Lingsearcher;
 using Lingsearcher.App_Start.Identity;
-using Lingsearcher.Entity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -9,10 +7,10 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
+using Hangfire;
+using Lingsearcher.Services;
+using Lingsearcher.Filters;
 
 [assembly: OwinStartup(typeof(ByteBank.Forum.Startup))]
 
@@ -24,6 +22,18 @@ namespace ByteBank.Forum
 
         public void Configuration(IAppBuilder builder)
         {
+            //Configuracao hangfire
+            GlobalConfiguration.Configuration.UseSqlServerStorage(ConnectionString);
+
+            builder.UseHangfireDashboard();
+            builder.UseHangfireServer();
+
+            //this call placement is important
+            //var options = new DashboardOptions
+            //{
+                //Authorization = new[] { new AuthorizationFilter() }
+            //};
+
             /*
              * Com connection string no Web Config
                 builder.CreatePerOwinContext<DbContext>(() =>
@@ -103,6 +113,8 @@ namespace ByteBank.Forum
                 ExpireTimeSpan = TimeSpan.FromMinutes(60)
             });
 
+            //Agendamento do job de atualizacao de precos diario
+            RecurringJob.AddOrUpdate(() => new ProductUpdateService().UpdatePrices(), Cron.Daily);
         }
     }
 }

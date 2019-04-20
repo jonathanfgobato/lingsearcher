@@ -13,5 +13,16 @@ namespace Lingsearcher.DAL
         {
             return Query($"Spr_Listar_{Name}_PorProductId", new { ProductId = productId });
         }
+        public void UpdateInfoProducts(ProductStore product)
+        {
+            ExecuteProcedure($"Spr_AtualizarPrecos_ProductStore", new
+            {
+                product.ProductId,
+                product.StoreId,
+                product.LastMinPrice,
+                product.LastMaxPrice,
+                product.Currency
+            });
+        }
     }
 }

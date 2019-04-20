@@ -1,14 +1,10 @@
-﻿using Lingsearcher.DAL;
+﻿using System.Linq;
+using System.Web.Mvc;
+using System.Collections.Generic;
+using Lingsearcher.DAL;
 using Lingsearcher.Entity;
 using Lingsearcher.Models.API;
-using Lingsearcher.Services;
 using Lingsearcher.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
 namespace Lingsearcher.Controllers
 {
@@ -24,8 +20,6 @@ namespace Lingsearcher.Controllers
         {
             List<SearchProductsViewModel> model = new List<SearchProductsViewModel>();
             List<Product> products = (List<Product>)new BaseDAO<Product>().GetAll();
-            List<ProductAPI> productAPIs = new List<ProductAPI>();
-            var stores = new BaseDAO<Store>().GetAll();
 
             foreach (var item in products)
             {
@@ -44,37 +38,37 @@ namespace Lingsearcher.Controllers
             {
                 List<ProductStore> productStore = (List<ProductStore>)new ProductStoreDAO().GetByProductId(item.Id);
 
-                foreach (var itemProductStore in productStore)
-                {
-                    itemProductStore.Store = new BaseDAO<Store>().GetById(itemProductStore.StoreId);
-                }
-
-                foreach (var itemProductStore in productStore)
-                {
-                    ProductAPIService productService = new ProductAPIService(itemProductStore.Store.Name, itemProductStore.ProductStoreId, item.Id);
-
-                    string htmlProductPage = productService.GetHtmlProductPage(stores);
-
-                    //Caso não venha vazio, adiciona a lista
-                    if (!string.IsNullOrEmpty(htmlProductPage))
-                    {
-                        productAPIs.Add(productService.GetProductInfo(stores, htmlProductPage));
-                    }
-                }
-
+                //Preencher lista de de SearchProductsViewModel com informacoes obtidas da lista productsSearch
                 SearchProductsViewModel search = new SearchProductsViewModel
                 {
                     IdProduct = item.Id,
                     NameProduct = item.Name,
                     NameBrand = item.Brand.Name,
-                    ImageSrc =  item.ImageSrc,
-                    NameCategory = item.Category.Name
+                    ImageSrc = item.ImageSrc,
+                    NameCategory = item.Category.Name,
+                    ProductsAPI = new List<ProductAPI>()
                 };
 
-                string minPrice = productAPIs.Where(c => c.MinPrice > 0 && c.ProductId == item.Id).Min(c => c.MinPrice).ToString();
-                string maxPrice = productAPIs.Where(c => c.MaxPrice > 0 && c.ProductId == item.Id).Max(c => c.MaxPrice).ToString();
+                foreach (var itemProductStore in productStore)
+                {
+                    itemProductStore.Store = new BaseDAO<Store>().GetById(itemProductStore.StoreId);
 
-                search.ProductsAPI = productAPIs.Where(p => p.ProductId == item.Id).ToList();
+                    ProductAPI productAPI = new ProductAPI
+                    {
+                        MinPrice = itemProductStore.LastMinPrice,
+                        MaxPrice = itemProductStore.LastMaxPrice,
+                        Currency = itemProductStore.Currency,
+                        ProductUrl = $"{itemProductStore.Store.UrlProduct}{itemProductStore.ProductStoreId}.html",
+                        PriceRange = $"{itemProductStore.LastMinPrice}-{itemProductStore.LastMaxPrice}",
+                        Store = itemProductStore.Store.Name
+                    };
+
+                    search.ProductsAPI.Add(productAPI);
+                }
+
+                string minPrice = search.ProductsAPI.Where(c => c.MinPrice > 0).Min(c => c.MinPrice).ToString();
+                string maxPrice = search.ProductsAPI.Where(c => c.MaxPrice > 0).Max(c => c.MaxPrice).ToString();
+
                 search.PriceRange = $"{minPrice}-{maxPrice}";
                 model.Add(search);
             }
