@@ -110,7 +110,7 @@ ALTER TABLE ProductStore
 
 SELECT * FROM ProductStore	
 
-SELECT * FROM Product
+SELECT * FROM LogException
 
 DROP TABLE ProductStore
 DROP TABLE Product

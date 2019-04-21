@@ -189,7 +189,6 @@
     <Compile Include="Controllers\ProductAPIController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
-    <Compile Include="DbContextIdentity.cs" />
     <Compile Include="Filters\AuthorizationFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
