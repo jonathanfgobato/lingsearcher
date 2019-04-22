@@ -18,5 +18,6 @@ namespace Lingsearcher.DAL
         {
             return Query($"Spr_Buscar_{Name}_PorUserApplicationId", new { UserApplicationId = id }).SingleOrDefault();
         }
+
     }
 }

@@ -332,7 +332,7 @@ END
 CREATE PROCEDURE Spr_Listar_ProductStore
 AS
 BEGIN
-	SELECT * FROM ProductStore
+	SELECT * FROM ProductStore where productid = 7
 END
 
 
@@ -358,4 +358,61 @@ END
 		,LastMaxPrice = null
 		,Currency = null
 
-SELECT * FROM ProductStore
+ALTER PROCEDURE Spr_Insert_Alert
+	 @ProductId INT
+	,@UserSystemId BIGINT
+	,@MinPrice NUMERIC(7, 2)
+	,@MaxNumberNotifications TINYINT
+	,@NumberNotificationsSend TINYINT = null
+AS
+BEGIN
+	INSERT INTO Alert
+		(
+			 ProductId
+			,UserSystemId
+			,MinPrice
+			,MaxNumberNotifications
+		)
+		VALUES
+		(
+			 @ProductId
+			,@UserSystemId
+			,@MinPrice
+			,@MaxNumberNotifications
+		)
+END
+
+CREATE PROCEDURE Spr_GetEmailByUserSystemId
+	@userSystemId INT
+AS
+BEGIN
+	SELECT
+		A.* 
+	FROM AspNetUsers AS A
+	INNER JOIN UserSystem AS B
+		ON A.Id = B.UserApplicationId
+	WHERE B.Id = @userSystemId
+END
+
+
+
+CREATE PROCEDURE Spr_Listar_Alert
+AS
+BEGIN
+	SELECT * FROM Alert
+END
+
+CREATE PROCEDURE Spr_Alterar_Alert_Notification
+	@Id INT,
+	@NumberNotificationsSend TINYINT
+AS
+BEGIN
+	UPDATE Alert SET NumberNotificationsSend = @NumberNotificationsSend
+	WHERE Id = @Id
+END
+
+SELECT * FROM Alert
+
+update productstore set LastMinPrice = 1500 where productid = 7 and StoreId = 2
+
+select * from ProductStore

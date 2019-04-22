@@ -41,6 +41,14 @@ namespace Lingsearcher.Services
                 itemProductStore.LastMaxPrice = productApi.MaxPrice;
                 itemProductStore.Currency = productApi.Currency;
 
+                //Alteracao temporaria para todos os precos ficarem em R$
+                if(itemProductStore.Store.Name.ToLower() == "dealextreme")
+                {
+                    itemProductStore.LastMinPrice *= 4;
+                    itemProductStore.LastMaxPrice *= 4;
+                    itemProductStore.Currency = "R$"; 
+                }
+
                 //Atualizar tabela de ProductStore
                 new ProductStoreDAO().UpdateInfoProducts(itemProductStore);
             }

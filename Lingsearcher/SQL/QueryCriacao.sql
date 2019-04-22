@@ -108,9 +108,27 @@ ALTER TABLE ProductStore
 		LastMaxPrice NUMERIC (7,2),
 		Currency CHAR(2)
 
+
+
+CREATE TABLE Alert
+(
+	Id BIGINT IDENTITY,
+	ProductId INT NOT NULL,
+	UserSystemId BIGINT NOT NULL,
+	MinPrice NUMERIC(7,2) NOT NULL,
+	MaxNumberNotifications TINYINT NOT NULL,
+	NumberNotificationsSend TINYINT DEFAULT 0,
+	CONSTRAINT PK_Alert_Id PRIMARY KEY(Id),
+	CONSTRAINT FK_Alert_ProductId FOREIGN KEY (ProductId) REFERENCES Product(Id),
+	CONSTRAINT FK_Alert_UserSystemId FOREIGN KEY (UserSystemId) REFERENCES UserSystem(Id)
+)
+
+
 SELECT * FROM ProductStore	
 
 SELECT * FROM LogException
 
 DROP TABLE ProductStore
 DROP TABLE Product
+
+select * from alert

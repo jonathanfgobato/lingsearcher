@@ -271,5 +271,23 @@ namespace Lingsearcher.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult ListProductsCompare(SearchProductsViewModel model)
+        {
+            string userApplicationId = Request.Form["UserApplicationId"];
+            UserSystem userSystem = new UserSystemDao().GetByUserApplicationId(userApplicationId);
+
+            Alert alert = new Alert
+            {
+                ProductId = model.IdProduct,
+                UserSystemId = userSystem.Id,
+                MinPrice = Convert.ToDouble(Request.Form["MinPrice"]),
+                MaxNumberNotifications = Convert.ToInt16(Request.Form["MaxNumberNotifications"])
+            };
+
+            new BaseDAO<Alert>().Insert(alert);
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="Alert.cs" />
     <Compile Include="Brand.cs" />
     <Compile Include="Category.cs" />
     <Compile Include="Domain.cs" />

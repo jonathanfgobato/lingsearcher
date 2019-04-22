@@ -12,7 +12,5 @@ namespace Lingsearcher.Entity
     {
         public string FullName { get; set; }
         public string Password { get; set; }
-
-
     }
 }

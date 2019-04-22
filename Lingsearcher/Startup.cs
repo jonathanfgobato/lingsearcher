@@ -118,6 +118,7 @@ namespace ByteBank.Forum
             RecurringJob.AddOrUpdate(() => new ProductUpdateService().UpdatePrices(), Cron.Daily);
 
             //Agendamento job de alertas de preco
+            RecurringJob.AddOrUpdate(() => new AlertService().VerifyAlerts(), "0 */30 * ? * *");
         }
     }
 }
